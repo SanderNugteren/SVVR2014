@@ -51,9 +51,9 @@ for i=1:392
     end
 end
 grid on;
-xlabel('MPG')
-ylabel('Horsepower')
-zlabel('Weigth')
+xlabel('MPG', 'FontSize',20)
+ylabel('Horsepower', 'FontSize',20)
+zlabel('Weigth', 'FontSize',20)
 whitebg([0 .5 .6])
 
 %legend({'US','Japan', 'Europe'},'FontSize',8,'FontWeight','bold')
