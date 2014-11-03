@@ -18,29 +18,43 @@ weigth = table{:,{'weigth'}};
 
 figure;
 hold on;
-grid on;
 
-for i=1:200%392
+
+for i=1:392
+    if cylinders(i) == 3;
+        shape = '^';
+    elseif cylinders(i) == 4;
+        shape = 's';
+    elseif cylinders(i) == 5;
+        shape = 'p';
+    elseif cylinders(i) == 6;
+        shape = 'h';
+    elseif cylinders(i) == 7;
+        shape = 'o';
+    elseif cylinders(i) == 8;
+        shape = 'd';
+    end
+    
     if strcmp(origin(i), 'US'); 
         color = ((year(i)-70)/15 + 0.2) * [1 0 0]; %red
         size = 100;
-        scatter3(mpg(i), hp(i), weigth(i), size, color, 'filled')
+        scatter3(mpg(i), hp(i), weigth(i), size, color, shape, 'filled', 'MarkerEdgeColor','r')
+        %text(mpg(i), hp(i), weigth(i), model(i))
     elseif strcmp(origin(i),'Japan');
         color = ((year(i)-70)/15 + 0.2) * [0 1 0]; %green
         size = 100;
-        scatter3(mpg(i), hp(i), weigth(i), size, color, 'filled')
+        scatter3(mpg(i), hp(i), weigth(i), size, color, shape, 'filled', 'MarkerEdgeColor','g')
     elseif strcmp(origin(i),'Europe');
         color = ((year(i)-70)/15 + 0.2) * [0 0 1]; %blue
         size = 100;
-        scatter3(mpg(i), hp(i), weigth(i), size, color, 'filled')
+        scatter3(mpg(i), hp(i), weigth(i), size, color, shape, 'filled', 'MarkerEdgeColor','b')
     end
 end
-
+grid on;
 xlabel('MPG')
 ylabel('Horsepower')
 zlabel('Weigth')
-legend('US', 'Japan', 'Europe')
+whitebg([0 .5 .6])
 
-grid on;
-grid;
+%legend({'US','Japan', 'Europe'},'FontSize',8,'FontWeight','bold')
 hold off;
