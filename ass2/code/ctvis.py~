@@ -38,13 +38,13 @@ pdm.ScalarVisibilityOff() #option 6
 #pdm.SetScalarRange(minVal, maxVal) #option 7
 #pdm.UseLookupTableScalarRangeOn() #option 7
 
-# ACTOR
+#make actor
 actor = vtk.vtkLODActor()
 actor.SetNumberOfCloudPoints(1000)
 actor.SetMapper(pdm)
 actor.GetProperty().SetColor(1, 1, 1) #option 6
 
-# RENDERER
+#initiate renderer
 ren = vtk.vtkRenderer()
 #ren.SetBackground( 0.329412, 0.34902, 0.427451 ) #background colour
 ren.AddActor(actor)

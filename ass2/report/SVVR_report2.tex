@@ -12,11 +12,11 @@
 The assignment is to create a visualization pipeline with VTK. The source will be a dataset consisting of images from a CT scanner. These 2D images combined form a 3D image of a body. Using VTK we will create a pipeline that takes the dataset as input and creates a 3D visualization of the body. The order of the sections will correspond to the steps of the pipeline.
 
 \subsection{Source}
-The data consists of 94 images created by a CT scanner. Each file is 131,072 bytes and the images are 256x256 or 512x512 pixels in size. Since 131,072 devided by 512x512 is only a half, we know that this is not possible. Deviding 131,072 by 256x256 however, gives us 2 bytes, which is a reasonable size of data per pixel. The collection of binary images is read by using VTKImageReader2.
+The data consists of 94 images created by a CT scanner. Each file is 131,072 bytes and the images are 256x256 or 512x512 pixels in size. Since 131,072 devided by 512x512 is only a half, we know that this is not possible. Deviding 131,072 by 256x256 however, gives us 2 bytes, which is a reasonable size of data per pixel. The collection of binary images is read by using \textsc{VTKImageReader2}.
 
 \subsection{Filter: Contour}
 Using the iso-surface contour visualization. 
-\\ - value range for the contour value
+\\ - value range for the contour value: 0 to $2^{16}$
 \\ - render an isosurface contour of the dataset, add an interactor so that you can interact with the resulting visualization
 \\ - allow the initial contour value to be passed from the commandline so that you can pass a different value each time you run your program > effect?
 
