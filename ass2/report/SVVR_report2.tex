@@ -15,36 +15,36 @@ The assignment is to create a visualization pipeline with VTK. The source will b
 The data consists of 94 images created by a CT scanner. Each file is 131,072 bytes and the images are 256x256 or 512x512 pixels in size. Since 131,072 devided by 512x512 is only a half, we know that this is not possible. Deviding 131,072 by 256x256 however, gives us 2 bytes, which is a reasonable size of data per pixel. The collection of binary images is read by using \textsc{VTKImageReader2}.
 
 \subsection{Filter: Contour}
-Using the iso-surface contour visualization. 
-\\ - value range for the contour value: 0 to $2^{16}$
-\\ - render an isosurface contour of the dataset, add an interactor so that you can interact with the resulting visualization
-\\ - allow the initial contour value to be passed from the commandline so that you can pass a different value each time you run your program > effect?
+At this stage a contour filter is used to create the isosurface. The range of the values is $\left[ 0,  65535.0) \right]$. The suggestion to start with a halfway value only renders a jaw, i.e. the dense bone. But by lowering the value softer tissues become visible. Around $700$ the skin is smooth, showing the soft tissue of the body and when increased to $1200$ we can see the bones. So the isosurfaces correspond to the density of the material.
 
 \subsection{Mapper}
 
+
+
 \subsection{Actor: Colours}
-Default: object in a dark blue on a black background
-\\ Three ways to change the colour of the object:
+Unfortunately VTK maintains a default of a dark blue object on a black background. To make the image more visible, three ways of changing this are implemented:
 \begin{itemize}
 \item Tell the contour filter stage to not compute scalar values and then set a colour in the actor
 \item Tell the mapper stage to ignore scalar values and then set a colour in the actor
-\item Tell the mapper what the actual scalar range is. 
+\item Tell the mapper what the actual scalar range is
 \end{itemize}
 
-Next, change the background colour and increase the size of the render window as well.
 
 \subsection{Data Spacing}
-Configure “data spacing” in source. By default voxels are isotropic, but we need ??
+By default voxels are isotropic, but this has to be adjusted to get a proper view of the head. In this case the voxels need to be adjusted to $(1,1,2)$ to make the data spacing more accurate.
+
 
 \subsection{Renderer: Setting the Scene}
-The renderer will create a camera and configure it so that the visualization will be visible in the render window. However, in most cases this will be suboptimal; the
-initial camera angle will not provide a useful view on your visualization. In that case it will be necessary to manipulate the camera. VTK uses two models to manipulate the camera:
-\\ - Camera is focused at a focal point (your visualization) and moves around
-this focal point using the Elevation, Roll and Azimuth methods.
-\\ - The movement of the camera is centered at the position of the camera and the orientation of the camera is controlled using the Yaw, Roll and Pitch methods.
-\\ Determine a better camera angle and add an outline to your visualization that shows a bounding box to represent the extent of the input data.
+The renderer configures the visualization in the window. 
+
+There are two models in VTK to manipulate the camera:
+\begin{itemize}
+\item Camera is focused at a focal point and moves around this focal point using the Elevation, Roll and Azimuth methods.
+\item The movement of the camera is centered at the position of the camera and the orientation of the camera is controlled using the Yaw, Roll and Pitch methods.
+\end{itemize}
+
 
 \section{Results}
-Explore all contour values in the dataset. 
+Explore all contour values in the dataset: histogram. 
 
 \end{document}
