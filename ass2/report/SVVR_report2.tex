@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
-\usepackage{graphicx,amsmath,amsfonts,amssymb}
+\usepackage{graphicx,amsmath,amsfonts,amssymb,caption,subcaption}
 
 \begin{document}
 \title{SVVR Assignment 2}
@@ -22,16 +22,13 @@ At this stage a contour filter is used to create the isosurface. The range of th
 \subsection{Colours}
 Unfortunately VTK maintains a default of a dark blue object on a black background. To make the image more visible, three ways of changing this are implemented:
 \begin{itemize}
-\item Tell the contour filter stage to not compute scalar values and then set a colour in the actor
-\item Tell the mapper stage to ignore scalar values and then set a colour in the actor
-\item Tell the mapper what the actual scalar range is
+\item Tell the contour filter stage to not compute scalar values and then set a
+	colour in the actor.
+\item Tell the mapper stage to ignore scalar values and then set a colour in
+	the actor.
+\item Tell the mapper what the actual scalar range is.
 \end{itemize}
-
-
-\subsection{Mapper}
-
-\subsection{Actor}
-
+We ended up using the third way to produce our visualisations.
 
 \subsection{Renderer: Setting the Scene}
 The renderer configures the visualization in the window. 
@@ -44,6 +41,37 @@ There are two models in VTK to manipulate the camera:
 
 
 \section{Results}
-Explore all contour values in the dataset: histogram. 
+
+In figure \ref{fig:skulls} we see two isosurfaces displayed. The head is displayed
+from two angles, so that we can see both surfaces in figure \ref{fig:skull1}.
+In figure \ref{fig:skull0} we see a tiny scar.
+In figure \ref{fig:skull1} we see that behind this scar a tiny blue object is
+lodged inside the skull. This might be what killed our victim.
+For clarity's sake, we displayed the blue parts without the skin in figure
+\ref{fig:jaw}.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{skull0}
+			\caption{Frontal picture of the head. Notice the scar circled in
+			red.}
+			\label{fig:skull0}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{skull1}
+			\caption{Foreign object lodged into head at scar position.}
+			\label{fig:skull1}
+	\end{subfigure}
+	\quad
+	\begin{subfigure}[b]{0.3\textwidth}
+		\includegraphics[width=\textwidth]{jaw}
+			\caption{Jaw and foreign object only.}
+			\label{fig:jaw}
+	\end{subfigure}
+	\caption{Skin is displayed in yellow (isosurface of 700), dense bones and
+	foreign object displayed in blue (isosurface of 3000)}\label{fig:skulls}
+\end{figure}
 
 \end{document}
