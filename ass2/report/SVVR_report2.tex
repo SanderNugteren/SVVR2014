@@ -14,14 +14,12 @@ The assignment is to create a visualization pipeline with VTK. The source will b
 \subsection{Source}
 The data consists of 94 images created by a CT scanner. Each file is 131,072 bytes and the images are 256x256 or 512x512 pixels in size. Since 131,072 devided by 512x512 is only a half, we know that this is not possible. Deviding 131,072 by 256x256 however, gives us 2 bytes, which is a reasonable size of data per pixel. The collection of binary images is read by using \textsc{VTKImageReader2}.
 
+By default voxels are isotropic, but this has to be adjusted to get a proper view of the head. In this case the voxels need to be adjusted to $(1,1,2)$ to make the data spacing more accurate.
+
 \subsection{Filter: Contour}
 At this stage a contour filter is used to create the isosurface. The range of the values is $\left[ 0,  65535.0) \right]$. The suggestion to start with a halfway value only renders a jaw, i.e. the dense bone. But by lowering the value softer tissues become visible. Around $700$ the skin is smooth, showing the soft tissue of the body and when increased to $1200$ we can see the bones. So the isosurfaces correspond to the density of the material.
 
-\subsection{Mapper}
-
-
-
-\subsection{Actor: Colours}
+\subsection{Colours}
 Unfortunately VTK maintains a default of a dark blue object on a black background. To make the image more visible, three ways of changing this are implemented:
 \begin{itemize}
 \item Tell the contour filter stage to not compute scalar values and then set a colour in the actor
@@ -30,8 +28,9 @@ Unfortunately VTK maintains a default of a dark blue object on a black backgroun
 \end{itemize}
 
 
-\subsection{Data Spacing}
-By default voxels are isotropic, but this has to be adjusted to get a proper view of the head. In this case the voxels need to be adjusted to $(1,1,2)$ to make the data spacing more accurate.
+\subsection{Mapper}
+
+\subsection{Actor}
 
 
 \subsection{Renderer: Setting the Scene}
