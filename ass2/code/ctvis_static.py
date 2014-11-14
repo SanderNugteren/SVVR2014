@@ -45,7 +45,7 @@ actor.SetMapper(pdm)
 
 # RENDERER
 ren = vtk.vtkRenderer()
-#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) #background colour
+#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
 ren.AddActor(actor)
 
 #camera
