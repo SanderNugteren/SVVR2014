@@ -35,17 +35,17 @@ conFilter.SetValue(1, 3000)
 #make contour filter
 pdm = vtk.vtkPolyDataMapper()
 pdm.SetInput(conFilter.GetOutput())
-#pdm.ScalarVisibilityOff() #option 6 
-pdm.SetScalarRange(0, 3000) #option 7
+#pdm.ScalarVisibilityOff() #color: option 6 
+pdm.SetScalarRange(0, 3000) #color: option 7
 
 # ACTOR
 actor = vtk.vtkLODActor()
 actor.SetMapper(pdm)
-#actor.GetProperty().SetColor(1, 1, 1) #option 6
+#actor.GetProperty().SetColor(1, 1, 1) #color: option 6
 
 # RENDERER
 ren = vtk.vtkRenderer()
-#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) #background colour
+#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
 ren.AddActor(actor)
 
 #camera
@@ -60,7 +60,7 @@ renwin.AddRenderer(ren)
 iren = vtk.vtkRenderWindowInteractor()
 iren.SetRenderWindow(renwin)
 
-#initialize rendering with timer
+#initialize rendering
 renwin.Render()
 iren.Initialize()
 iren.Start()

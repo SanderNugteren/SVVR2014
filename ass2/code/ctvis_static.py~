@@ -36,7 +36,7 @@ conFilter.SetValue(1, 3000)
 pdm = vtk.vtkPolyDataMapper()
 pdm.SetInput(conFilter.GetOutput())
 #pdm.ScalarVisibilityOff() #option 6 
-pdm.SetScalarRange(100, 3000) #option 7
+pdm.SetScalarRange(0, 3000) #option 7
 
 # ACTOR
 actor = vtk.vtkLODActor()
@@ -45,7 +45,7 @@ actor.SetMapper(pdm)
 
 # RENDERER
 ren = vtk.vtkRenderer()
-#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) #background colour
+#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
 ren.AddActor(actor)
 
 #camera
