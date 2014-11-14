@@ -50,14 +50,11 @@ def main():
 	#make contour filter
 	pdm = vtk.vtkPolyDataMapper()
 	pdm.SetInput(conFilter.GetOutput())
-	#pdm.ScalarVisibilityOff() #option 6 
-	pdm.SetScalarRange(minVal, maxVal) #option 7
-	pdm.UseLookupTableScalarRangeOn() #option 7
+	pdm.SetScalarRange(0, 3000) #option 7
 
 	# ACTOR
 	actor = vtk.vtkLODActor()
 	actor.SetMapper(pdm)
-	#actor.GetProperty().SetColor(1, 1, 1) #option 6
 
 	# RENDERER
 	ren = vtk.vtkRenderer()

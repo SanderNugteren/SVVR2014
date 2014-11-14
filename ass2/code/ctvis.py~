@@ -16,7 +16,7 @@ class vtkTimerCallback():
 		iren = obj
 		iren.GetRenderWindow().Render()
 		self.timer_count += 10
-		if self.timer_count > 100:
+		if self.timer_count > 3000:
 			iren.DestroyTimer()
 
 def main():
@@ -84,8 +84,5 @@ def main():
 
 	#start rendering
 	iren.Start()
-
-#	if cb.timer_count > 100:
-#		iren.DestroyTimer()
 
 main()
