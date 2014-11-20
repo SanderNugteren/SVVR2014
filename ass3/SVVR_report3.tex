@@ -8,5 +8,20 @@
 \renewcommand{\today}{November 24, 2014}
 \maketitle
 
+\section*{Visualization of a Static Mixing Reactor}
+The goal of the assignment is to use VTK to render a visualization of a static mixing reactor. The source of the visualization pipeline is a dataset containing scalars that represent the mixer and vectors that represent the fluids. Since the vectors represent the direction and velocity of the flow and the fluids are submitted from opposite sides, the fluids can be distinguished by the direction of their flow. 
+
+Three filters are applied to the data, one to model the isosurface of the mixer and two line tracers to model the fluids. 
+
+Then, the three actors are combined in one renderer. 
+
+Images showing:
+\begin{itemize}
+\item The morphology of the reactor
+\item The capability of the reactor to mix two fluids
+\item The flow velocity around the reactor
+\end{itemize}
+
+
 \end{document}
 
