@@ -55,6 +55,4 @@ xlabel('MPG', 'FontSize',20)
 ylabel('Horsepower', 'FontSize',20)
 zlabel('Weigth', 'FontSize',20)
 whitebg([0 .5 .6])
-
-%legend({'US','Japan', 'Europe'},'FontSize',8,'FontWeight','bold')
 hold off;
