@@ -12,8 +12,8 @@ def makeStreamActors(center, color):
 	"""
 	#make a source to generate stream lines from
 	lineSource = vtk.vtkPointSource()
-	lineSource.SetRadius(5)
-	lineSource.SetCenter(1,30,30)
+	lineSource.SetRadius(15)
+	lineSource.SetCenter(center)
 	lineSource.SetNumberOfPoints(200)
 
 	#make streamlines using the source created above
@@ -65,10 +65,8 @@ mixerActor = vtk.vtkLODActor()
 mixerActor.SetMapper(pdm1)
 
 #create actors for both streams
-#fluid1Actor = makeStreamActors((20,15,30), (1.0, 0.0, 0.0))
-#fluid2Actor = makeStreamActors((20,45,30), (0.0, 1.0, 0.0))
-fluid1Actor = makeStreamActors((20,30,45), (1.0, 0.0, 0.0))
-fluid2Actor = makeStreamActors((20,30,15), (0.0, 1.0, 0.0))
+fluid1Actor = makeStreamActors((20,15,30), (1.0, 0.0, 0.0))
+fluid2Actor = makeStreamActors((20,45,30), (0.0, 1.0, 0.0))
 
 # RENDERER
 ren = vtk.vtkRenderer()
