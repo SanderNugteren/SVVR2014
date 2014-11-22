@@ -7,8 +7,8 @@ import sys
 
 def makeStreamActors(center, color):
 	"""
-	This function produces streamlines for a stream centered at 'center' and returns an actor for use in rendering.
-	Stream color can be specified using the 'color' variable.
+	This function produces streamlines for a stream centered at 'center' and returns an actor 
+    for use in rendering. Stream color can be specified using the 'color' variable.
 	"""
 	#make a source to generate stream lines from
 	lineSource = vtk.vtkPointSource()

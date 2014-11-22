@@ -5,6 +5,43 @@
 import vtk
 import sys
 
+def makeStreamActors(center, color):
+	"""
+	This function produces streamlines for a stream centered at 'center' and returns an actor 
+    for use in rendering. Stream color can be specified using the 'color' variable.
+	"""
+	#make a source to generate stream lines from
+	lineSource = vtk.vtkPointSource()
+	lineSource.SetRadius(15)
+	lineSource.SetCenter(center)
+	lineSource.SetNumberOfPoints(200)
+
+	#make streamlines using the source created above
+	streamLine = vtk.vtkStreamLine()
+	streamLine.SetInput(imageData)
+	streamLine.SetSource(lineSource.GetOutput())
+	streamLine.SetMaximumPropagationTime(2000)
+	streamLine.SetIntegrationStepLength(.2)
+	streamLine.SetStepLength(0.1)
+	streamLine.SetNumberOfThreads(100)
+	streamLine.SetIntegrationDirectionToIntegrateBothDirections	()
+	streamLine.VorticityOn()
+
+	#make tubes around the streamlines for visibility
+	streamTube = vtk.vtkTubeFilter()
+	streamTube.SetInput(streamLine.GetOutput())
+	streamTube.SetRadius(0.1)
+	streamTube.SetNumberOfSides(12)
+	
+	pdm = vtk.vtkPolyDataMapper()
+	pdm.SetInput(streamTube.GetOutput())
+	pdm.ScalarVisibilityOff()
+	
+	actor = vtk.vtkActor()
+	actor.SetMapper(pdm)
+	actor.GetProperty().SetColor(color)
+	return actor
+
 # SOURCE
 #read in data
 reader = vtk.vtkStructuredPointsReader()
@@ -14,66 +51,29 @@ reader.ReadAllScalarsOn()
 reader.UpdateWholeExtent()
 imageData = reader.GetOutput()
 
-# 3 FILTERS
 #make isosurface of the scalars (ie mixer)
 conFilter = vtk.vtkContourFilter()
 conFilter.SetInput(imageData)
 conFilter.SetValue(0, 10)
 
-#make 'forward' vectorlines of the vectors (ie fluid1)
-streamline = vtk.vtkStreamLine()
-streamline.SetInputData(imageData))
-streamline.SetMaximumPropagationTime(200)
-streamline.SetIntegrationStepLength(.2)
-streamline.SetStepLength(0.001)
-streamline.SetNumberOfThreads(1)
-streamline.SetIntegrationDirectionToForward()
-streamline.VorticityOn()
-
-#make 'backward' vectorlines of the vectors (ie fluid2)
-streamFilter2 = vtk.vtkStreamTracer()
-streamFilter2.SetInput(imageData)
-streamFilter2.SetIntegrationDirectionToBackward()
-
-"""
-#make tubes around the streams for visibility
-streamTube1 = vtk.vtkTubeFilter()
-streamTube1.SetInputConnection(streamFilter1.GetOutput())
-streamTube1.SetRadius(0.02)
-streamTube1.SetNumberOfSides(12)
-
-streamTube2 = vtk.vtkTubeFilter()
-streamTube2.SetInputConnection(streamFilter2.GetOutput())
-streamTube2.SetRadius(0.02)
-streamTube2.SetNumberOfSides(12)
-"""
-
-# 3 MAPPERS
+# Map the mixer
 pdm1 = vtk.vtkPolyDataMapper()
 pdm1.SetInput(conFilter.GetOutput())
 
-pdm2 = vtk.vtkPolyDataMapper()
-pdm2.SetInput(streamLine.GetOutput())
+# Create an actor for the mixer
+mixerActor = vtk.vtkLODActor()
+mixerActor.SetMapper(pdm1)
 
-pdm3 = vtk.vtkPolyDataMapper()
-pdm3.SetInput(streamFilter2.GetOutput())
-
-# 3 ACTORS
-actor1 = vtk.vtkLODActor()
-actor1.SetMapper(pdm1)
-
-actor2 = vtk.vtkLODActor()
-actor2.SetMapper(pdm2)
-
-actor3 = vtk.vtkLODActor()
-actor3.SetMapper(pdm3)
+#create actors for both streams
+fluid1Actor = makeStreamActors((20,15,30), (1.0, 0.0, 0.0))
+fluid2Actor = makeStreamActors((20,45,30), (0.0, 1.0, 0.0))
 
 # RENDERER
 ren = vtk.vtkRenderer()
-#ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
-ren.AddActor(actor1)
-ren.AddActor(actor2)
-ren.AddActor(actor3)
+#ren.SetBackground( 0.329412, 0.34902, 0.427451 )
+#ren.AddActor(mixerActor)
+ren.AddActor(fluid1Actor)
+ren.AddActor(fluid2Actor)
 
 #camera
 #camera = vtk.vtkCamera()
