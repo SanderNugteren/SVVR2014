@@ -2,6 +2,9 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx,amsmath,amsfonts,amssymb,caption,subcaption, subfigure}
 \usepackage[font={scriptsize}]{caption}
+\usepackage[T1]{fontenc}
+\usepackage{titling}
+\setlength{\droptitle}{-10em}
 
 \begin{document}
 \title{SVVR Assignment 3}
@@ -9,16 +12,16 @@
 \renewcommand{\today}{November 24, 2014}
 \maketitle
 
+
 \section*{Visualization of a Static Mixing Reactor}
 The goal of the assignment is to use VTK to render a visualization of a static mixing reactor. The source of the visualization pipeline is a dataset containing scalars that represent the mixer and vectors that represent the fluid. 
 
-Three filters are applied to the data, one to model the isosurface of the mixer and two line tracers to model each fluid. Each line tracer has their own center from which the lines originate to show how two colours get mixed through the mixer. Then tubes are assigned to these lines to add thickness to make them visible.  
+Three filters are applied to the data in series, one to model the isosurface of the mixer and two line tracers to model each fluid. Each line tracer has their own center from which the lines originate to show how two colours get mixed through the mixer. Then tubes are assigned to these lines to add thickness to make them visible.  
 
 Next, all filters are assigned to their own mapper to set the graphical primitives and then passed on to an actor. For colouring the mapper stage is set to ignore scalar values, giving the color as a argument of the actor. Finally these actors are combined in one renderer. 
 
-\section*{Results}
 \subsection*{The morphology of the reactor}
-For the morphology of the reactor, only the isosurface is depictured, on a lighter background. The images shown by \ref{mixerMorph} show the structure of the mixer. The image on the right shows that the beams of the structure have spikes to disperse the fluids more efficiently for mixing.
+For the morphology of the reactor, only the isosurface is depictured, on a lighter background. The images shown by \ref{mixerMorph} show the structure of the mixer. The image on the left shows the frontal view, how the beams are piled, the middle one shows a clear 3D structure of these beams and the right picture shows that the beams of the structure have spikes to disperse the fluids more efficiently for mixing.
 
 \begin{figure}[ht]
 \centering
@@ -47,9 +50,13 @@ To show whether the mixer is capable of mixing the two fluids, all three filters
 \end{figure}  
 
 \subsection*{The flow velocity around the reactor}
+Figure \ref{around} shows the flow of a part of the fluids, namely the parts that are injected at the sides. This image shows that even the fluid that is not directed through the middle actually gets sucked in an ends up in the middle anyway, making sure that the entire fluids are mixed.  
 
-
+\begin{figure}[ht]
+\centering
+\includegraphics[width=6cm]{SVVR_around.png}
+\caption{The flow of the fluids when only injected from the sides.}
+\label{around}
+\end{figure}  
 
 \end{document}
-
-
