@@ -68,6 +68,11 @@ mixerActor.SetMapper(pdm1)
 fluid1Actor = makeStreamActors((20,15,30), (1.0, 0.0, 0.0))
 fluid2Actor = makeStreamActors((20,45,30), (0.0, 1.0, 0.0))
 
+#coordinates for the stream around the reactor
+#fluid1Actor = makeStreamActors((20,0,30), (1.0, 0.0, 0.0))
+#fluid2Actor = makeStreamActors((20,60,30), (0.0, 1.0, 0.0))
+
+
 # RENDERER
 ren = vtk.vtkRenderer()
 #ren.SetBackground( 0.329412, 0.34902, 0.427451 )
