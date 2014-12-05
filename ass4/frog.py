@@ -69,9 +69,17 @@ for i in renderList:
 	ren.AddActor(actorList[i-1])
 
 legend = vtk.vtkLegendBoxActor()
+legend.SetNumberOfEntries(len(renderList))
+#legendBox = vtk.vtkCubeSource()
+#legendBox.Update()
 for i in renderList:
 	legend.SetEntryString(i, organList[i])
 	legend.SetEntryColor(i, color[organList[i]])
+
+legend.GetPositionCoordinate().SetCoordinateSystemToView()
+legend.GetPositionCoordinate().SetValue(.5, -0.99)
+legend.GetPosition2Coordinate().SetCoordinateSystemToView()
+legend.GetPosition2Coordinate().SetValue(0.99, -0.25)
 	
 ren.AddActor(legend)
 	
