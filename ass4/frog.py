@@ -6,16 +6,20 @@ import vtk
 import sys
 
 # SOURCE
-#read in images from ct scanner (94 images, 256x256 pixels)
-reader = vtk.vtkImageReader2()
-reader.SetFilePrefix("./WholeFrog/frogTissue.")
-reader.SetFilePattern("%s%03d.raw")
-reader.SetDataExtent(0, 499, 0, 469, 1, 136)
-reader.SetDataOrigin(1.0, 1.0, 1.0)
-reader.SetDataScalarTypeToUnsignedChar()
-reader.SetDataSpacing(1,1,1.5) #data spacing
-reader.UpdateWholeExtent()
-imageData = reader.GetOutput()
+def reader(filenames):
+    reader = vtk.vtkImageReader2()
+    reader.SetFilePrefix(filenames)
+    reader.SetFilePattern("%s%03d.raw")
+    reader.SetDataExtent(0, 499, 0, 469, 1, 136)
+    reader.SetDataOrigin(1.0, 1.0, 1.0)
+    reader.SetDataScalarTypeToUnsignedChar()
+    reader.SetDataSpacing(1,1,1.5) #data spacing
+    reader.UpdateWholeExtent()
+    imageData = reader.GetOutput()
+    return imageData
+
+imageData = reader("./WholeFrog/frogTissue.")
+imageData2 = reader("./WholeFrog/frog.")
 
 # LIBRARY
 organList = ['', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart', 'ileum', 'kidney', 'large intestine', 'liver', 'lung', 'nerve', 'skeleton', 'spleen', 'stomach']
@@ -44,6 +48,21 @@ color['stomach'] = (0.2,0.2,0.7) #dark blue
 
 # ACTOR PER THRESHOLD FILTER
 actorList = []
+
+#make isosurface
+conFilter = vtk.vtkContourFilter()
+conFilter.SetInput(imageData2)
+conFilter.SetValue(0, 50)
+#make contour filter
+pdm = vtk.vtkPolyDataMapper()
+pdm.SetInput(conFilter.GetOutput())
+pdm.ScalarVisibilityOff() 
+# ACTOR
+actor = vtk.vtkLODActor()
+actor.SetMapper(pdm)
+actor.GetProperty().SetColor(0, 1, 0) 
+actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
+actorList.append(actor)
 
 for i in xrange(1,len(organList)):
 	#make isosurface
