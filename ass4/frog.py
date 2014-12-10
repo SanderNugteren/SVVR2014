@@ -24,10 +24,11 @@ organList = ['', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart
 color = {}
 color['blood'] = (1,0,0)        #red
 color['skeleton'] = (1,1,1)     #white
-color['eye retina'] = (0.8,0,0.8) #pink
+color['eye retina'] = (0.9,0,0.9) #pink
 color['eye white'] = (1,0,1) #light pink
-color['nerve'] = (0.5,0,0.5)    #purple
-color['brain'] = (0.2,0,0.2)        #blue (bright)
+color['nerve'] = (0.4,0,0.4)    #purple
+color['brain'] = (0.7,0,0.7)        #dark purple
+
 color['heart'] = (0,0,0)        #black
 color['lung'] = (0,1,0)         #blue (dark)
 
