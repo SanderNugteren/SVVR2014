@@ -15,8 +15,11 @@ def reader(filenames):
     reader.SetDataScalarTypeToUnsignedChar()
     reader.SetDataSpacing(1,1,1.5) #data spacing
     reader.UpdateWholeExtent()
-    imageData = reader.GetOutput()
-    return imageData
+    clip = vtk.vtkImageClip()
+    clip.SetInputConnection( reader.GetOutputPort() )
+    clip.SetOutputWholeExtent(0,499,0,235,1,136)
+    clip.ClipDataOn()
+    return clip.GetOutput()
 
 imageData = reader("./WholeFrog/frogTissue.")
 imageData2 = reader("./WholeFrog/frog.")
