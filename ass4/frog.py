@@ -26,25 +26,30 @@ organList = ['', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart
 
 # setting the colour for each tissue
 color = {}
-color['blood'] = (1,0,0)        #red
+#skeleton: white
 color['skeleton'] = (1,1,1)     #white
-color['eye retina'] = (0.9,0,0.9) #pink
-color['eye white'] = (1,0,1) #light pink
-color['nerve'] = (0.4,0,0.4)    #purple
-color['brain'] = (0.7,0,0.7)        #dark purple
 
-color['heart'] = (0,0,0)        #black
-color['lung'] = (0,1,0)         #blue (dark)
+#bloodflow: red
+color['blood'] = (1,0,0.2)      #red
+color['heart'] = (0.8,0,0)      #dark black
 
-color['liver'] = (0.45,0.3,0.2) #brown
-color['kidney'] = (1,0.5,0.3)   #orange
+#nerve system: pink/purple
+color['eye retina'] = (0.9,0.3,0.9) #pink
+color['eye white'] = (1,0.7,1)  #light pink
+color['nerve'] = (0.6,0,0.6)    #purple
+color['brain'] = (0.7,0.1,1)    #dark purple
 
-color['duodenum'] = (0.3,0.3,0) #
-color['ileum'] = (0.6, 0.6, 0)  #
-color['large intestine'] = (1,1,0) #yellow
+#respiratory system: blue
+color['lung'] = (0,0.8,0.8)     #blue
 
-color['spleen'] = (0.3,0.5,0.3) #green
-color['stomach'] = (0.2,0.2,0.7) #dark blue
+#digestive tract: yellow
+color['liver'] = (0.6,0.4,0.2)  #brown
+color['kidney'] = (1,0.6,0.2)   #orange
+color['duodenum'] = (0.9,0.9,0) #yellow
+color['large intestine'] = (1,1,0.6) # light yellow
+color['spleen'] = (0.3,0.5,0.3) #greenish
+color['ileum'] = (0.6, 0.6, 0)  #greenish/brownish
+color['stomach'] = (0.8,0.5,0.2) #brown
 
 # ACTOR PER THRESHOLD FILTER
 actorList = []
@@ -60,7 +65,7 @@ pdm.ScalarVisibilityOff()
 # ACTOR
 actor = vtk.vtkLODActor()
 actor.SetMapper(pdm)
-actor.GetProperty().SetColor(0, 1, 0) 
+actor.GetProperty().SetColor(0, 0.8, 0) # green skin 
 actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
 actorList.append(actor)
 
@@ -72,16 +77,15 @@ for i in xrange(1,len(organList)):
 
 	# MAPPER
 	#make contour filter
-	dsm = vtk.vtkDataSetMapper ()
+	dsm = vtk.vtkDataSetMapper()
 	dsm.SetInput(thresholdFilter.GetOutput())
-	dsm.ScalarVisibilityOff() #color: option 6 
-	#dsm.SetScalarRange(0, 3000) #color: option 7
+	dsm.ScalarVisibilityOff() 
 
 	# ACTOR
 	actor = vtk.vtkLODActor()
 	actor.SetMapper(dsm)
 	organCol = color[organList[i]]
-	actor.GetProperty().SetColor(organCol) #color: option 6
+	actor.GetProperty().SetColor(organCol)
 	actorList.append(actor)
 
 # RENDERER
