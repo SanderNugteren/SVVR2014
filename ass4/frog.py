@@ -57,6 +57,8 @@ color['stomach'] = (0.8,0.5,0.2) #brown
 # ACTOR PER THRESHOLD FILTER
 actorList = []
 
+#TODO change this to volume rendering
+"""
 #make isosurface
 conFilter = vtk.vtkContourFilter()
 conFilter.SetInput(imageData2)
@@ -71,8 +73,20 @@ actor.SetMapper(pdm)
 actor.GetProperty().SetColor(0, 0.8, 0) # green skin 
 actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
 actorList.append(actor)
+"""
+
+# RENDERER
+ren = vtk.vtkRenderer()
+ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
+
+volumeMapper = vtk.vtkSmartVolumeMapper()
+volumeMapper.SetInputConnection(imageData.GetProducerPort())
+
+#TODO for nowI placed an empty string here, but later this should perhaps be replaced with the frog outline
+volumeList = [""]
 
 for i in xrange(1,len(organList)):
+	"""
 	#make isosurface
 	thresholdFilter = vtk.vtkThreshold()
 	thresholdFilter.SetInput(imageData)
@@ -90,14 +104,41 @@ for i in xrange(1,len(organList)):
 	organCol = color[organList[i]]
 	actor.GetProperty().SetColor(organCol)
 	actorList.append(actor)
-
-# RENDERER
-ren = vtk.vtkRenderer()
-ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
+	"""
+	#make a volume property for an organ, to be given to the volume
+	volumeProperty = vtk.vtkVolumeProperty()
+	volumeProperty.ShadeOff()
+	volumeProperty.SetInterpolationTypeToLinear()
+	#add opacity function to the volume property
+	compositeOpacity = vtk.vtkPiecewiseFunction()
+	compositeOpacity.AddPoint(0.0,0.0)
+	compositeOpacity.AddPoint(i-0.2,0.0)
+	compositeOpacity.AddPoint(i-0.1,1.0)
+	compositeOpacity.AddPoint(i+0.1,1.0)
+	compositeOpacity.AddPoint(i+0.2,0.0)
+	compositeOpacity.AddPoint(len(organList),0.0)
+	volumeProperty.SetScalarOpacity(compositeOpacity)
+	#add a color function to the volume property
+	volColor = vtk.vtkColorTransferFunction()
+	organCol = color[organList[i]]
+	volColor.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(i-0.2, 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(i-0.1, organCol[0], organCol[1], organCol[2])
+	volColor.AddRGBPoint(i+0.1, organCol[0], organCol[1], organCol[2])
+	volColor.AddRGBPoint(i+0.2, 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(len(organList), 0.0, 0.0, 0.0)
+	volumeProperty.SetColor(volColor)
+	#make the volume itself
+	volume = vtk.vtkVolume()
+	volume.SetMapper(volumeMapper)
+	volume.SetProperty(volumeProperty)
+	volumeList.append(volume)
+	
 
 renderList = range(1,len(organList))
 for i in renderList:
-	ren.AddActor(actorList[i-1])
+	ren.AddViewProp(volumeList[i])
+	ren.ResetCamera()
 
 # LEGEND
 legend = vtk.vtkLegendBoxActor()
