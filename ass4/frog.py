@@ -31,20 +31,16 @@ organList = ['', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart
 color = {}
 #skeleton: white
 color['skeleton'] = (1,1,1)     #white
-
 #bloodflow: red
 color['blood'] = (1,0,0.2)      #red
 color['heart'] = (0.8,0,0)      #dark black
-
 #nerve system: pink/purple
 color['eye retina'] = (0.9,0.3,0.9) #pink
 color['eye white'] = (1,0.7,1)  #light pink
 color['nerve'] = (0.6,0,0.6)    #purple
 color['brain'] = (0.7,0.1,1)    #dark purple
-
 #respiratory system: blue
 color['lung'] = (0,0.8,0.8)     #blue
-
 #digestive tract: yellow
 color['liver'] = (0.6,0.4,0.2)  #brown
 color['kidney'] = (1,0.6,0.2)   #orange
@@ -54,31 +50,27 @@ color['spleen'] = (0.3,0.5,0.3) #greenish
 color['ileum'] = (0.6, 0.6, 0)  #greenish/brownish
 color['stomach'] = (0.8,0.5,0.2) #brown
 
-# ACTOR PER THRESHOLD FILTER
-actorList = []
-
-#TODO change this to volume rendering
-"""
+##################################################################################
+# FILTER
 #make isosurface
 conFilter = vtk.vtkContourFilter()
-conFilter.SetInput(imageData2)
+conFilter.SetInput(imageData)
 conFilter.SetValue(0, 50)
+
+# MAPPER
 #make contour filter
 pdm = vtk.vtkPolyDataMapper()
 pdm.SetInput(conFilter.GetOutput())
 pdm.ScalarVisibilityOff() 
+
 # ACTOR
 actor = vtk.vtkLODActor()
 actor.SetMapper(pdm)
-actor.GetProperty().SetColor(0, 0.8, 0) # green skin 
+actor.GetProperty().SetColor(0, 1, 0) #green skin
 actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
-actorList.append(actor)
-"""
 
-# RENDERER
-ren = vtk.vtkRenderer()
-ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
-
+##################################################################################
+# VOLUME MAPPER
 volumeMapper = vtk.vtkSmartVolumeMapper()
 volumeMapper.SetInputConnection(imageData.GetProducerPort())
 
@@ -86,25 +78,6 @@ volumeMapper.SetInputConnection(imageData.GetProducerPort())
 volumeList = [""]
 
 for i in xrange(1,len(organList)):
-	"""
-	#make isosurface
-	thresholdFilter = vtk.vtkThreshold()
-	thresholdFilter.SetInput(imageData)
-	thresholdFilter.ThresholdBetween(i, i)
-
-	# MAPPER
-	#make contour filter
-	dsm = vtk.vtkDataSetMapper()
-	dsm.SetInput(thresholdFilter.GetOutput())
-	dsm.ScalarVisibilityOff() 
-
-	# ACTOR
-	actor = vtk.vtkLODActor()
-	actor.SetMapper(dsm)
-	organCol = color[organList[i]]
-	actor.GetProperty().SetColor(organCol)
-	actorList.append(actor)
-	"""
 	#make a volume property for an organ, to be given to the volume
 	volumeProperty = vtk.vtkVolumeProperty()
 	volumeProperty.ShadeOff()
@@ -126,7 +99,7 @@ for i in xrange(1,len(organList)):
 	volColor.AddRGBPoint(i-0.1, organCol[0], organCol[1], organCol[2])
 	volColor.AddRGBPoint(i+0.1, organCol[0], organCol[1], organCol[2])
 	volColor.AddRGBPoint(i+0.2, 0.0, 0.0, 0.0)
-	volColor.AddRGBPoint(len(organList), 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(len(organList)+1, 0.0, 0.0, 0.0)
 	volumeProperty.SetColor(volColor)
 	#make the volume itself
 	volume = vtk.vtkVolume()
@@ -134,8 +107,12 @@ for i in xrange(1,len(organList)):
 	volume.SetProperty(volumeProperty)
 	volumeList.append(volume)
 	
+# RENDERER
+ren = vtk.vtkRenderer()
+ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
+ren.AddActor(actor)
 
-renderList = range(1,len(organList))
+renderList = range(13,15)#(1,len(organList))
 for i in renderList:
 	ren.AddViewProp(volumeList[i])
 	ren.ResetCamera()
@@ -145,15 +122,21 @@ legend = vtk.vtkLegendBoxActor()
 legend.SetNumberOfEntries(len(renderList))
 #legendBox = vtk.vtkCubeSource()
 #legendBox.Update()
-for i in renderList:
-    legend.SetEntryString(i-1, organList[i])
-    legend.SetEntryColor(i-1, color[organList[i]])
+for i in range(len(renderList)):
+    legend.SetEntryString(i, organList[renderList[i]])
+    legend.SetEntryColor(i, color[organList[renderList[i]]])
 
 legend.GetPositionCoordinate().SetCoordinateSystemToView()
 legend.GetPositionCoordinate().SetValue(.5, -0.99)
 legend.GetPosition2Coordinate().SetCoordinateSystemToView()
 legend.GetPosition2Coordinate().SetValue(0.99, -0.25)
 ren.AddActor(legend)
+
+#camera
+camera = vtk.vtkCamera()
+camera.SetPosition(128,1000,200)
+camera.SetFocalPoint(128,0,100)
+ren.SetActiveCamera(camera)
 	
 #renderwindow and render interactor
 renwin = vtk.vtkRenderWindow()
