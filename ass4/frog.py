@@ -5,6 +5,10 @@
 import vtk
 import sys
 
+# parameters
+skin = True # Visualize the skin or only the organs
+
+##################################################################################
 # SOURCE
 def reader(filenames):
     reader = vtk.vtkImageReader2()
@@ -24,11 +28,14 @@ def reader(filenames):
 imageData = reader("./WholeFrog/frogTissue.")
 imageData2 = reader("./WholeFrog/frog.")
 
+##################################################################################
 # LIBRARY
-organList = ['', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart', 'ileum', 'kidney', 'large intestine', 'liver', 'lung', 'nerve', 'skeleton', 'spleen', 'stomach']
+organList = ['skin', 'blood', 'brain', 'duodenum', 'eye retina', 'eye white', 'heart', 'ileum', 'kidney', 'large intestine', 'liver', 'lung', 'nerve', 'skeleton', 'spleen', 'stomach']
 
 # setting the colour for each tissue
 color = {}
+#skin: green
+color['skin'] = (0,1,0)         #green 
 #skeleton: white
 color['skeleton'] = (1,1,1)     #white
 #bloodflow: red
@@ -51,31 +58,64 @@ color['ileum'] = (0.6, 0.6, 0)  #greenish/brownish
 color['stomach'] = (0.8,0.5,0.2) #brown
 
 ##################################################################################
+# Using contourfilter for the photographs of the sliced frog
+
 # FILTER
 #make isosurface
-conFilter = vtk.vtkContourFilter()
-conFilter.SetInput(imageData)
-conFilter.SetValue(0, 50)
+#conFilter = vtk.vtkContourFilter()
+#conFilter.SetInput(imageData)
+#conFilter.SetValue(0, 50)
 
 # MAPPER
 #make contour filter
-pdm = vtk.vtkPolyDataMapper()
-pdm.SetInput(conFilter.GetOutput())
-pdm.ScalarVisibilityOff() 
+#pdm = vtk.vtkPolyDataMapper()
+#pdm.SetInput(conFilter.GetOutput())
+#pdm.ScalarVisibilityOff() 
 
 # ACTOR
-actor = vtk.vtkLODActor()
-actor.SetMapper(pdm)
-actor.GetProperty().SetColor(0, 1, 0) #green skin
-actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
+#actor = vtk.vtkLODActor()
+#actor.SetMapper(pdm)
+#actor.GetProperty().SetColor(0, 1, 0) #green skin
+#actor.GetProperty().SetOpacity(0.1) #lower is more opaque 
 
 ##################################################################################
+# Using volume rendering
+volumeList = []
+
+# Render the skin
+if skin:
+    # VOLUME MAPPER
+    volumeMapper2 = vtk.vtkSmartVolumeMapper()
+    volumeMapper2.SetInputConnection(imageData2.GetProducerPort())
+
+    #make a volume property for an organ, to be given to the volume
+    volumeProperty2 = vtk.vtkVolumeProperty()
+    volumeProperty2.ShadeOff()
+    volumeProperty2.SetInterpolationTypeToLinear()
+    #add opacity function to the volume property
+    compositeOpacity2 = vtk.vtkPiecewiseFunction()
+    compositeOpacity2.AddPoint(0.0,0.0)
+    compositeOpacity2.AddPoint(49.9,0.0)
+    compositeOpacity2.AddPoint(50,0.5)
+    compositeOpacity2.AddPoint(50.1,0.0)
+    volumeProperty2.SetScalarOpacity(compositeOpacity2)
+    #add a color function to the volume property
+    volColor2 = vtk.vtkColorTransferFunction()
+    volColor2.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
+    volColor2.AddRGBPoint(49.9, 0.0, 0.0, 0.0)
+    volColor2.AddRGBPoint(50, 0, 1, 0) # green skin
+    volColor2.AddRGBPoint(50.1, 0.0, 0.0, 0.0)
+    volColor2.AddRGBPoint(len(organList)+1, 0.0, 0.0, 0.0)
+    volumeProperty2.SetColor(volColor2)
+    #make the volume itself
+    volume2 = vtk.vtkVolume()
+    volume2.SetMapper(volumeMapper2)
+    volume2.SetProperty(volumeProperty2)
+    volumeList.append(volume2)
+
 # VOLUME MAPPER
 volumeMapper = vtk.vtkSmartVolumeMapper()
 volumeMapper.SetInputConnection(imageData.GetProducerPort())
-
-#TODO for nowI placed an empty string here, but later this should perhaps be replaced with the frog outline
-volumeList = [""]
 
 for i in xrange(1,len(organList)):
 	#make a volume property for an organ, to be given to the volume
@@ -85,20 +125,18 @@ for i in xrange(1,len(organList)):
 	#add opacity function to the volume property
 	compositeOpacity = vtk.vtkPiecewiseFunction()
 	compositeOpacity.AddPoint(0.0,0.0)
-	compositeOpacity.AddPoint(i-0.2,0.0)
-	compositeOpacity.AddPoint(i-0.1,1.0)
-	compositeOpacity.AddPoint(i+0.1,1.0)
-	compositeOpacity.AddPoint(i+0.2,0.0)
+	compositeOpacity.AddPoint(i-0.1,0.0)
+	compositeOpacity.AddPoint(i,1.0)
+	compositeOpacity.AddPoint(i+0.1,0.0)
 	compositeOpacity.AddPoint(len(organList),0.0)
 	volumeProperty.SetScalarOpacity(compositeOpacity)
 	#add a color function to the volume property
 	volColor = vtk.vtkColorTransferFunction()
 	organCol = color[organList[i]]
 	volColor.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
-	volColor.AddRGBPoint(i-0.2, 0.0, 0.0, 0.0)
-	volColor.AddRGBPoint(i-0.1, organCol[0], organCol[1], organCol[2])
-	volColor.AddRGBPoint(i+0.1, organCol[0], organCol[1], organCol[2])
-	volColor.AddRGBPoint(i+0.2, 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(i-0.1, 0.0, 0.0, 0.0)
+	volColor.AddRGBPoint(i, organCol[0], organCol[1], organCol[2])
+	volColor.AddRGBPoint(i+0.1, 0.0, 0.0, 0.0)
 	volColor.AddRGBPoint(len(organList)+1, 0.0, 0.0, 0.0)
 	volumeProperty.SetColor(volColor)
 	#make the volume itself
@@ -106,17 +144,18 @@ for i in xrange(1,len(organList)):
 	volume.SetMapper(volumeMapper)
 	volume.SetProperty(volumeProperty)
 	volumeList.append(volume)
-	
+
+##################################################################################	
 # RENDERER
 ren = vtk.vtkRenderer()
 ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
-ren.AddActor(actor)
 
-renderList = range(13,15)#(1,len(organList))
+renderList = range(0,len(organList))
 for i in renderList:
 	ren.AddViewProp(volumeList[i])
 	ren.ResetCamera()
 
+##################################################################################
 # LEGEND
 legend = vtk.vtkLegendBoxActor()
 legend.SetNumberOfEntries(len(renderList))
@@ -134,9 +173,9 @@ ren.AddActor(legend)
 
 #camera
 camera = vtk.vtkCamera()
-camera.SetPosition(128,1000,200)
-camera.SetFocalPoint(128,0,100)
-ren.SetActiveCamera(camera)
+camera.SetPosition(0,0,0)
+#camera.SetFocalPoint(-128,0,100)
+#ren.SetActiveCamera(camera)
 	
 #renderwindow and render interactor
 renwin = vtk.vtkRenderWindow()
