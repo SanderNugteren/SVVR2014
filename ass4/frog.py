@@ -7,11 +7,16 @@ import sys
 
 # parameters
 skin = False # Visualize the skin or the organs
-clipVertical = False
-renderList = [2] #range(2,14) 
+clipToLeft = False
+clipToRight = False
+renderList = range(1,15) 
 ##################################################################################
 # SOURCE
 def reader(filenames):
+    """
+	This function reads in a dataset and clips it if the appropriate flags
+	(clipToLeft, clipToRight) are set
+    """
     reader = vtk.vtkImageReader2()
     reader.SetFilePrefix(filenames)
     reader.SetFilePattern("%s%03d.raw")
@@ -20,10 +25,16 @@ def reader(filenames):
     reader.SetDataScalarTypeToUnsignedChar()
     reader.SetDataSpacing(1,1,1.5) #data spacing
     reader.UpdateWholeExtent()
-    if clipVertical:
+    if clipToLeft:
         clip = vtk.vtkImageClip()
         clip.SetInputConnection( reader.GetOutputPort() )
         clip.SetOutputWholeExtent(0,499,0,235,1,136)
+        clip.ClipDataOn()
+        return clip.GetOutput()
+    elif clipToRight:
+        clip = vtk.vtkImageClip()
+        clip.SetInputConnection( reader.GetOutputPort() )
+        clip.SetOutputWholeExtent(0,499,235,469,1,136)
         clip.ClipDataOn()
         return clip.GetOutput()
     else:
@@ -65,6 +76,43 @@ color['stomach'] = (0.8,0.5,0.2) #brown
 # Using volume rendering
 volumeList = []
 
+
+# VOLUME MAPPER
+volumeMapper = vtk.vtkSmartVolumeMapper() #vtkVolumeRayCastMapper()
+volumeMapper.SetInputConnection(imageData.GetProducerPort())
+#make a volume property the organs, to be given to the volume
+volumeProperty = vtk.vtkVolumeProperty()
+volumeProperty.ShadeOff()
+volumeProperty.SetInterpolationTypeToLinear()
+#add opacity function and color function to the volume property
+compositeOpacity = vtk.vtkPiecewiseFunction()
+volColor = vtk.vtkColorTransferFunction()
+compositeOpacity.AddPoint(0.0, 0.0)
+volColor.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
+#generate peaks in the transfer functions for the organs to be rendered
+for i in renderList:
+    compositeOpacity.AddPoint(i-0.1,0.0)
+    compositeOpacity.AddPoint(i,1.0)
+    compositeOpacity.AddPoint(i+0.1,0.0)
+    organCol = color[organList[i]]
+    volColor.AddRGBPoint(i-0.1, 0.0, 0.0, 0.0)
+    volColor.AddRGBPoint(i, organCol[0], organCol[1], organCol[2])
+    volColor.AddRGBPoint(i+0.1, 0.0, 0.0, 0.0)
+compositeOpacity.AddPoint(len(organList)+1, 0.0)
+volumeProperty.SetScalarOpacity(compositeOpacity)
+volColor.AddRGBPoint(len(organList)+1, 0.0, 0.0, 0.0)
+volumeProperty.SetColor(volColor)
+
+volume = vtk.vtkVolume()
+volume.SetMapper(volumeMapper)
+volume.SetProperty(volumeProperty)
+	
+##################################################################################	
+# RENDERER
+ren = vtk.vtkRenderer()
+ren.SetBackground(0.329412, 0.34902, 0.427451) 
+ren.AddViewProp(volume)
+
 # Render the skin
 if skin:
     # VOLUME MAPPER
@@ -78,9 +126,9 @@ if skin:
     #add opacity function to the volume property
     compositeOpacity2 = vtk.vtkPiecewiseFunction()
     compositeOpacity2.AddPoint(0.0,0.0)
-    compositeOpacity2.AddPoint(40,0.8)
-    compositeOpacity2.AddPoint(50,0.8)
-    compositeOpacity2.AddPoint(60,0.8)
+    compositeOpacity2.AddPoint(49,0.1)
+    compositeOpacity2.AddPoint(50,0.1)
+    compositeOpacity2.AddPoint(60,0.0)
     volumeProperty2.SetScalarOpacity(compositeOpacity2)
     #add a color function to the volume property
     volColor2 = vtk.vtkColorTransferFunction()
@@ -94,50 +142,14 @@ if skin:
     volume2 = vtk.vtkVolume()
     volume2.SetMapper(volumeMapper2)
     volume2.SetProperty(volumeProperty2)
-    volumeList.append(volume2)
+    ren.AddViewProp(volume2)
 
-# VOLUME MAPPER
-volumeMapper = vtk.vtkSmartVolumeMapper() #vtkVolumeRayCastMapper()
-volumeMapper.SetInputConnection(imageData.GetProducerPort())
-#make a volume property for an organ, to be given to the volume
-volumeProperty = vtk.vtkVolumeProperty()
-volumeProperty.ShadeOff()
-volumeProperty.SetInterpolationTypeToLinear()
-#add opacity function to the volume property
-compositeOpacity = vtk.vtkPiecewiseFunction()
-volColor = vtk.vtkColorTransferFunction()
-compositeOpacity.AddPoint(0.0,0.0)
-volColor.AddRGBPoint(0.0, 0.0, 0.0, 0.0)
-for i in renderList:
-    compositeOpacity.AddPoint(i-0.1,0.0)
-    compositeOpacity.AddPoint(i,1.0)
-    compositeOpacity.AddPoint(i+0.1,0.0)
-    organCol = color[organList[i]]
-    volColor.AddRGBPoint(i-0.1, 0.0, 0.0, 0.0)
-    volColor.AddRGBPoint(i, organCol[0], organCol[1], organCol[2])
-    volColor.AddRGBPoint(i+0.1, 0.0, 0.0, 0.0)
-compositeOpacity.AddPoint(len(organList),0.0)
-volumeProperty.SetScalarOpacity(compositeOpacity)
-volColor.AddRGBPoint(len(organList)+1, 0.0, 0.0, 0.0)
-volumeProperty.SetColor(volColor)
-
-volume = vtk.vtkVolume()
-volume.SetMapper(volumeMapper)
-volume.SetProperty(volumeProperty)
-	
-##################################################################################	
-# RENDERER
-ren = vtk.vtkRenderer()
-ren.SetBackground( 0.329412, 0.34902, 0.427451 ) 
-ren.AddViewProp(volume)
 ren.ResetCamera()
 
 ##################################################################################
 # LEGEND
 legend = vtk.vtkLegendBoxActor()
 legend.SetNumberOfEntries(len(renderList))
-#legendBox = vtk.vtkCubeSource()
-#legendBox.Update()
 for i in range(len(renderList)):
     legend.SetEntryString(i, organList[renderList[i]])
     legend.SetEntryColor(i, color[organList[renderList[i]]])
@@ -151,8 +163,6 @@ ren.AddActor(legend)
 #camera
 camera = vtk.vtkCamera()
 camera.SetPosition(0,0,0)
-#camera.SetFocalPoint(-128,0,100)
-#ren.SetActiveCamera(camera)
 	
 #renderwindow and render interactor
 renwin = vtk.vtkRenderWindow()
